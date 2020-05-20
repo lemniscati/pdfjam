@@ -1076,6 +1076,18 @@ cd "$pwd" || exit 1
 if test -f "$fileName".pdf  ## if LaTeX didn't choke
 then
     ##  Checks on output file path:
+    if test x"$outFile" = x"$pwd" \
+       && test x"$sourcePath" = x"/dev/stdin" ; then
+	## When '--outfile' seems unspecified and sourcePath is /dev/stdin,
+	## it would be better to output to stdout.
+	outFile="/dev/stdout"
+    fi
+    if test x"$outFile" = x"/dev/stdout" && test -t 1 ; then
+	## Avoid outputting to a terminal.
+	error_exit \
+	    "--outfile cannot be stdout, when stdout is connected to tty" \
+	    $E_USAGE
+    fi
     if test -d "$outFile"  ## outfile is a directory
     then
 	if test "$sourcePath" = /dev/stdin 
